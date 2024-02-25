@@ -30,6 +30,7 @@ local Emotes = rs.Emotes.Equip
 local Codes = rs.RedeemCode
 local MagicEquip = rs.Magics.Change
 local upgrades = rs.Stats.Upgrades
+local Aura = rs.Auras.Turn
 
 local passes = require(rs.GiftGamepass.GiftableGamepasses)
 
@@ -50,7 +51,7 @@ local function ownsgamepass (userid, gamepassId)
 end
 
 local function getban(player)
-	if ds:GetAsync(player.UserId) then
+	if banDs:GetAsync(player.UserId) then
 		return true
 	end
 	return false
@@ -202,14 +203,12 @@ game:BindToClose(function()
 end)
 
 game.Players.PlayerAdded:Connect(function(player)
-	task.spawn(function()
-		OnAdded(player)
-	end)
 	player.CharacterAdded:Connect(function()
 		if getban(player) then
 			player:Kick("You've got banned from this game")
 			return
 		end
+		OnAdded(player)
 		task.spawn(function()
 			while task.wait() do
 				if player.Character then
@@ -387,6 +386,14 @@ radio.OnServerEvent:Connect(function(player, id, todo)
 				player.Settings.RadioOn.Value = 1
 			end
 		end 
+	end
+end)
+
+Aura.OnServerEvent:Connect(function(player, op)
+	if op == "Off" then
+		player.StatsData.IsAura.Value = 1
+	else
+		player.StatsData.IsAura.Value = 0
 	end
 end)
 
